@@ -7,14 +7,24 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ *
+ *
+ *
+ */
+
 public class DeArchFiles {
+    /**
+     * На вход принимает имя архива
+     * Определяю расположение каталога, откуда вызвана программа
+     * Распаковваю архив в каталог
+     * @param fileArch
+     * @throws IOException
+     */
     public void deArch(String fileArch) throws IOException {
         ZipInputStream zis = new ZipInputStream(new FileInputStream(fileArch));
-        File file=new File(fileArch);
-
-        String path=file.getAbsolutePath();
-        String str=path.substring(0,path.lastIndexOf('\\')-1);
-        File destDir = new File(str);
+        String dir=System.getProperty("user.dir");
+        File destDir = new File(dir);
 
         byte[] buffer = new byte[1024];
 
