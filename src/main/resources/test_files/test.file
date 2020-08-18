@@ -1,0 +1,6 @@
+всю жизнь пользовался System.getProperty("user.dir"), 
+на виндовсе, на 2-х линуксах(Mandriva, Debian) все работает....
+пример... если прога лежит 
+в /home/den/javaprojects/project/jar/(linux)
+или D:\javaprojects\project\jar\(win)
+То юзер дир мне этот путь и возвращает...

@@ -1,0 +1,6 @@
+ public String ProgrammDir(){
+    URL pathURL = constants.class.getProtectionDomain().getCodeSource().getLocation();
+	String path= String.valueOf(pathURL);
+	path=path.substring(5, path.length()-1);
+	path=path.substring(0, path.lastIndexOf("/")+1).replace("/", constants.FileSeparator);
+	return path;
