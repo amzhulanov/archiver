@@ -1,8 +1,5 @@
 package jam.example.archiver;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,39 +8,50 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Класс для Архивации файла
+ *
+ * @author JAM
+ */
+
 public class ArchFiles {
-    public void arch(List<String> srcFiles, String output) throws IOException {
 
+    /**
+     * Метод для архивации файла
+     *
+     * @param srcFiles - Лист файлов и директорий для архивации
+     * @param outFile - имя архива, указанного при запуске программы
+     * @param outDir   - каталог из которого была запущена программа
+     */
+    public void arch(List<String> srcFiles, String outFile, String outDir) {
 
-        final FileOutputStream fos = new FileOutputStream(output);
-        final ZipOutputStream zipOut = new ZipOutputStream(fos);
-        for (final String srcFile : srcFiles) {
-            final File fileToZip = new File(srcFile);
-            if (fileToZip.isFile() && fileToZip.exists()) {
-                final FileInputStream fis = new FileInputStream(fileToZip);
-                final ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
-                zipOut.putNextEntry(zipEntry);
+        try (final FileOutputStream fos = new FileOutputStream(outDir.concat("//").concat(outFile).concat(".arch"));
+             final ZipOutputStream zipOut = new ZipOutputStream(fos)) {
 
-                final byte[] bytes = new byte[1024];
-                int length;
-                while ((length = fis.read(bytes)) >= 0) {
-                    zipOut.write(bytes, 0, length);
+            for (final String srcFile : srcFiles) {
+                final File fileToZip = new File(srcFile);
+                if (fileToZip.isFile() && fileToZip.exists()) {
+                    try(final FileInputStream fis = new FileInputStream(fileToZip)){
+                    final ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+                    zipOut.putNextEntry(zipEntry);
+
+                    final byte[] bytes = new byte[1024];
+                    int length;
+                    while ((length = fis.read(bytes)) >= 0) {
+                        zipOut.write(bytes, 0, length);
+                    }}
+                } else if (fileToZip.isDirectory()) {
+                    zipCatalog(fileToZip, fileToZip.getName(), zipOut);
                 }
-                fis.close();
             }
-            else if (fileToZip.isDirectory()){
-                System.out.println("find catalog. start archived catalog");
-                zipCatalog(fileToZip,fileToZip.getName(),zipOut);
-            }
-            else{
-                System.out.println("the specified file is not found");
-            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
-        zipOut.close();
-        fos.close();
     }
 
-    private static void zipCatalog(final File fileToZip, final String fileName, final ZipOutputStream zipOut) throws IOException {
+
+    private static void zipCatalog(final File fileToZip, final String fileName, final ZipOutputStream zipOut) throws
+            IOException {
         if (fileToZip.isHidden()) {
             return;
         }

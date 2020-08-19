@@ -1,52 +1,63 @@
 package jam.example.archiver;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
+ *Класс для ДеАрхивации файла
  *
- *
- *
+ * @author JAM
  */
 
 public class DeArchFiles {
     /**
-     * На вход принимает имя архива
+     * Метод для деархивации файла
+     * На вход deArch принимает имя архива
      * Определяю расположение каталога, откуда вызвана программа
-     * Распаковваю архив в каталог
-     * @param fileArch
-     * @throws IOException
+     * Распаковваю архив в каталог из которого запущена программа
+     *
+     * @param fileArch - имя архива
+     * @param outDir - путь для распаковки архива
      */
-    public void deArch(String fileArch) throws IOException {
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(fileArch));
-        String dir=System.getProperty("user.dir");
-        File destDir = new File(dir);
-
+    public void deArch(String fileArch, String outDir) {
+        File destDir = new File(outDir);
         byte[] buffer = new byte[1024];
 
-        ZipEntry zipEntry = zis.getNextEntry();
-        while (zipEntry != null) {
-            File newFile = newFile(destDir, zipEntry);
-            if (!zipEntry.toString().endsWith("/")) {
-                FileOutputStream fos = new FileOutputStream(newFile);
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
+        try(ZipInputStream zis = new ZipInputStream(new FileInputStream(fileArch))) {
+
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                File newFile = newFile(destDir, zipEntry);
+                if (!zipEntry.toString().endsWith("/")) {
+                    try(FileOutputStream fos = new FileOutputStream(newFile)) {
+                        int len;
+                        while ((len = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+
+                    }
+                } else if (!newFile.exists()) {
+                    if (!newFile.mkdir()){
+                        throw new SecurityException();
+                    }
                 }
-                fos.close();
-            }else if (!newFile.exists()) {
-                newFile.mkdir();
+                zipEntry = zis.getNextEntry();
             }
-            zipEntry = zis.getNextEntry();
+            zis.closeEntry();
+        }catch(IOException ex){
+            ex.printStackTrace();
         }
-        zis.closeEntry();
-        zis.close();
     }
 
+    /**
+     * Метод для формирования файла с указанием месторасположения
+     *
+     * @param destinationDir - расположение файла
+     * @param zipEntry - объект архива
+     * @return
+     * @throws IOException
+     */
     public File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         File destFile = new File(destinationDir, zipEntry.getName());
 
