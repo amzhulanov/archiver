@@ -20,26 +20,27 @@ public class ArchFiles {
      * Метод для архивации файла
      *
      * @param srcFiles - Лист файлов и директорий для архивации
-     * @param outFile - имя архива, указанного при запуске программы
-     * @param outDir   - каталог из которого была запущена программа
+     * @param outFile  - имя архива, указанного при запуске программы
      */
-    public void arch(List<String> srcFiles, String outFile, String outDir) {
+    public void arch(List<String> srcFiles, String outFile) {
 
-        try (final FileOutputStream fos = new FileOutputStream(outDir.concat("//").concat(outFile).concat(".arch"));
+        try (final FileOutputStream fos = new FileOutputStream(outFile);
              final ZipOutputStream zipOut = new ZipOutputStream(fos)) {
 
             for (final String srcFile : srcFiles) {
                 final File fileToZip = new File(srcFile);
                 if (fileToZip.isFile() && fileToZip.exists()) {
-                    try(final FileInputStream fis = new FileInputStream(fileToZip)){
-                    final ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
-                    zipOut.putNextEntry(zipEntry);
+                    try (final FileInputStream fis = new FileInputStream(fileToZip)) {
+                        final ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+                        zipEntry.setMethod(ZipEntry.DEFLATED);
+                        zipOut.putNextEntry(zipEntry);
 
-                    final byte[] bytes = new byte[1024];
-                    int length;
-                    while ((length = fis.read(bytes)) >= 0) {
-                        zipOut.write(bytes, 0, length);
-                    }}
+                        final byte[] bytes = new byte[1024];
+                        int length;
+                        while ((length = fis.read(bytes)) >= 0) {
+                            zipOut.write(bytes, 0, length);
+                        }
+                    }
                 } else if (fileToZip.isDirectory()) {
                     zipCatalog(fileToZip, fileToZip.getName(), zipOut);
                 }
@@ -79,4 +80,5 @@ public class ArchFiles {
         }
         fis.close();
     }
+
 }

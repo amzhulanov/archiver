@@ -5,7 +5,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- *Класс для ДеАрхивации файла
+ * Класс для ДеАрхивации файла
  *
  * @author JAM
  */
@@ -18,19 +18,19 @@ public class DeArchFiles {
      * Распаковваю архив в каталог из которого запущена программа
      *
      * @param fileArch - имя архива
-     * @param outDir - путь для распаковки архива
+     * @param outDir   - путь для распаковки архива
      */
     public void deArch(String fileArch, String outDir) {
         File destDir = new File(outDir);
         byte[] buffer = new byte[1024];
 
-        try(ZipInputStream zis = new ZipInputStream(new FileInputStream(fileArch))) {
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(fileArch))) {
 
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
                 File newFile = newFile(destDir, zipEntry);
                 if (!zipEntry.toString().endsWith("/")) {
-                    try(FileOutputStream fos = new FileOutputStream(newFile)) {
+                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
                         int len;
                         while ((len = zis.read(buffer)) > 0) {
                             fos.write(buffer, 0, len);
@@ -38,14 +38,14 @@ public class DeArchFiles {
 
                     }
                 } else if (!newFile.exists()) {
-                    if (!newFile.mkdir()){
+                    if (!newFile.mkdir()) {
                         throw new SecurityException();
                     }
                 }
                 zipEntry = zis.getNextEntry();
             }
             zis.closeEntry();
-        }catch(IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -54,9 +54,9 @@ public class DeArchFiles {
      * Метод для формирования файла с указанием месторасположения
      *
      * @param destinationDir - расположение файла
-     * @param zipEntry - объект архива
-     * @return
-     * @throws IOException
+     * @param zipEntry       - объект архива
+     * @return возвращает файл, расположенный в соответствии с маршрутом из архива
+     * @throws IOException - бросает исключение, если маршрут расположн за пределы области архива
      */
     public File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         File destFile = new File(destinationDir, zipEntry.getName());
@@ -70,4 +70,5 @@ public class DeArchFiles {
 
         return destFile;
     }
+
 }

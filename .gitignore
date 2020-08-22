@@ -4,3 +4,5 @@
 /.idea
 *.arch
 *.jar
+*.file
+archiver.iml
