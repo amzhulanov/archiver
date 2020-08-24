@@ -61,5 +61,5 @@ public class ManageArch {
     private static void getListParams(String[] args, List<String> srcFiles) {
         srcFiles.addAll(Arrays.asList(args).subList(0, args.length - 2));
     }
-    
+
 }
